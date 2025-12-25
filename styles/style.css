@@ -27,6 +27,10 @@ body::before {
     padding: 24px;
     position: relative;
     z-index: 1;
+    min-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 @media (max-width: 768px) {
@@ -239,6 +243,14 @@ body::before {
 .instructions strong {
     color: #111827;
     font-weight: 600;
+}
+
+.footer-note {
+    margin-top: 48px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(0,0,0,0.55);
+    line-height: 1.4;
 }
 
 .grid {
