@@ -259,6 +259,34 @@ function handleTagChoice() {
   pendingSelection = null;
 }
 
+function exportTags() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tagMap));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "tags.json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function importTags() {
+    document.getElementById('importFile').click();
+}
+
+function handleFileSelect(event) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const newTagMap = JSON.parse(event.target.result);
+        for (const tag in newTagMap) {
+            tagMap[tag] = newTagMap[tag];
+        }
+        saveTags();
+        renderTags();
+        processEditor();
+    };
+    reader.readAsText(event.target.files[0]);
+}
+
 function unredact() {
   let text = document.getElementById("ai").value;
   for (const tag in tagMap) {

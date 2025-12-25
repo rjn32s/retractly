@@ -21,6 +21,9 @@
   <button onclick="prepareTagSelection()">Tag Selection</button>
   <select id="tagDropdown" style="display:none" onchange="handleTagChoice()"></select>
   <button onclick="unredact()">Unredact →</button>
+  <button onclick="importTags()">Import Tags</button>
+  <button onclick="exportTags()">Export Tags</button>
+  <input type="file" id="importFile" style="display: none" onchange="handleFileSelect(event)">
 </div>
 
 <div class="tags" id="tags"></div>
