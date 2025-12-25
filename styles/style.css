@@ -37,6 +37,26 @@ select { margin-left: 8px; }
     animation-iteration-count: infinite;
 }
 
+.popup {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 8px;
+    z-index: 100;
+}
+
+#popup-content {
+    display: flex;
+    flex-direction: column;
+}
+
+#popup-content button {
+    margin-bottom: 4px;
+}
+
+
 @keyframes shake {
     0% { transform: translate(1px, 1px) rotate(0deg); }
     10% { transform: translate(-1px, -2px) rotate(-1deg); }

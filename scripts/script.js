@@ -159,7 +159,7 @@ function renderTags() {
     const label = document.createElement("strong");
     label.textContent = `{{${tag}}}`;
     label.style.background = colorForTag(tag);
-    label.style.padding = "2px 6px";
+    label.padding = "2px 6px";
     label.style.borderRadius = "4px";
 
     const input = document.createElement("input");
@@ -184,80 +184,74 @@ function renderTags() {
   }
 }
 
-function prepareTagSelection() {
-  const sel = window.getSelection();
-  if (!sel || sel.toString().trim() === "") {
-    alert("Select text first");
-    return;
-  }
+function showPopup(x, y) {
+    const popup = document.getElementById('popup');
+    const popupContent = document.getElementById('popup-content');
+    popupContent.innerHTML = '';
 
-  pendingSelection = sel.toString();
+    for (const tag in tagMap) {
+        const button = document.createElement('button');
+        button.textContent = tag;
+        button.onclick = () => applyTag(tag);
+        popupContent.appendChild(button);
+    }
 
-  const dropdown = document.getElementById("tagDropdown");
-  dropdown.innerHTML = "";
-  dropdown.style.display = "inline";
+    const createButton = document.createElement('button');
+    createButton.textContent = '+ Create new tag';
+    createButton.onclick = () => applyTag(null);
+    popupContent.appendChild(createButton);
 
-  const placeholder = document.createElement("option");
-  placeholder.textContent = "Select tag…";
-    placeholder.disabled = true;
-    placeholder.selected = true;
-  dropdown.appendChild(placeholder);
-
-  for (const tag in tagMap) {
-    const opt = document.createElement("option");
-    opt.value = tag;
-    opt.textContent = tag;
-    dropdown.appendChild(opt);
-  }
-
-  const createOpt = document.createElement("option");
-  createOpt.value = "__new__";
-  createOpt.textContent = "+ Create new tag";
-  dropdown.appendChild(createOpt);
+    popup.style.left = x + 'px';
+    popup.style.top = y + 'px';
+    popup.style.display = 'block';
 }
 
-function handleTagChoice() {
-  const dropdown = document.getElementById("tagDropdown");
-  const choice = dropdown.value;
-  dropdown.style.display = "none";
+function hidePopup() {
+    const popup = document.getElementById('popup');
+    popup.style.display = 'none';
+}
 
-  if (!pendingSelection) return;
+function applyTag(tag) {
+    if (!pendingSelection) return;
 
-  let tag = choice;
-
-  if (choice === "__new__") {
-    tag = prompt("Enter new tag name:");
     if (!tag) {
-      pendingSelection = null;
-      return;
+        tag = prompt("Enter new tag name:");
+        if (!tag) {
+            pendingSelection = null;
+            return;
+        }
+        tagMap[tag] = pendingSelection;
+        saveTags();
+        renderTags();
     }
-    tagMap[tag] = pendingSelection;
-    saveTags();
-    renderTags();
-  }
 
-  const editor = document.getElementById("input");
-  const plain = getPlainText();
-  const pattern = new RegExp(escapeRegex(pendingSelection), "gi");
-  const replaced = plain.replace(pattern, `{{${tag}}}`);
-  editor.innerHTML = renderHighlightedHTML(replaced);
-
-  const allTags = editor.querySelectorAll('.tag');
-  for (let i = 0; i < allTags.length; i++) {
-    if (allTags[i].textContent === `{{${tag}}}`) {
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.setStartAfter(allTags[i]);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-      editor.focus();
-      break;
-    }
-  }
-
-  pendingSelection = null;
+    const editor = document.getElementById("input");
+    const plain = getPlainText();
+    const pattern = new RegExp(escapeRegex(pendingSelection), "gi");
+    const replaced = plain.replace(pattern, `{{${tag}}}`);
+    editor.innerHTML = renderHighlightedHTML(replaced);
+    processEditor();
+    hidePopup();
+    pendingSelection = null;
 }
+
+document.getElementById('input').addEventListener('mouseup', (event) => {
+    const selection = window.getSelection().toString().trim();
+    if (selection) {
+        pendingSelection = selection;
+        showPopup(event.clientX, event.clientY);
+    } else {
+        hidePopup();
+    }
+});
+
+document.addEventListener('mousedown', (event) => {
+    const popup = document.getElementById('popup');
+    if (!popup.contains(event.target) && event.target.id !== 'input') {
+        hidePopup();
+    }
+});
+
 
 function exportTags() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tagMap));
