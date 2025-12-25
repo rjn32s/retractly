@@ -7,21 +7,23 @@
 </head>
 <body>
 
-<h2>Retractly — MVP</h2>
+<div class="container">
+    <h2 class="title">Retractly — MVP</h2>
 
-<div class="grid">
-  <div id="input" class="editor" contenteditable="true"
-       placeholder="Paste or type text here"></div>
+    <div class="grid">
+      <div id="input" class="editor" contenteditable="true"
+           placeholder="Paste or type text here"></div>
 
-  <textarea id="ai" placeholder="Paste AI response here"
-            style="height:220px;width:100%"></textarea>
-</div>
+      <textarea id="ai" placeholder="Paste AI response here"
+                style="height:220px;width:100%"></textarea>
+    </div>
 
-<div style="margin-top: 8px;">
-  <button onclick="unredact()">Unredact →</button>
-  <button onclick="importTags()">Import Tags</button>
-  <button onclick="exportTags()">Export Tags</button>
-  <input type="file" id="importFile" style="display: none" onchange="handleFileSelect(event)">
+    <div style="margin-top: 8px;">
+      <button onclick="unredact()">Unredact →</button>
+      <button onclick="importTags()">Import Tags</button>
+      <button onclick="exportTags()">Export Tags</button>
+      <input type="file" id="importFile" style="display: none" onchange="handleFileSelect(event)">
+    </div>
 </div>
 
 <div id="popup" class="popup" style="display: none;">
