@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Retractly MVP</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+
+<h2>Retractly — MVP</h2>
+
+<div class="grid">
+  <div id="input" class="editor" contenteditable="true"
+       placeholder="Paste or type text here"></div>
+
+  <textarea id="ai" placeholder="Paste AI response here"
+            style="height:220px;width:100%"></textarea>
+</div>
+
+<div style="margin-top: 8px;">
+  <button onclick="prepareTagSelection()">Tag Selection</button>
+  <select id="tagDropdown" style="display:none" onchange="handleTagChoice()"></select>
+  <button onclick="unredact()">Unredact →</button>
+</div>
+
+<div class="tags" id="tags"></div>
+
+<script src="scripts/script.js"></script>
+
+</body>
+</html>
