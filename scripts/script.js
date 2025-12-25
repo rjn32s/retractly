@@ -148,20 +148,40 @@ function processEditor() {
 }
 /* ---------- Tag UI ---------- */
 
+function toggleSettings() {
+    const tagsContainer = document.getElementById('tags');
+    tagsContainer.classList.toggle('hidden');
+}
+
 function renderTags() {
-  const container = document.getElementById("tags");
-  container.innerHTML = "<h4>Tag Map</h4>";
+  const container = document.getElementById("tag-table-container");
+  container.innerHTML = "";
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const tbody = document.createElement('tbody');
+
+  const headerRow = document.createElement('tr');
+  const tagHeader = document.createElement('th');
+  tagHeader.textContent = 'Tag';
+  const valueHeader = document.createElement('th');
+  valueHeader.textContent = 'Value';
+  const actionsHeader = document.createElement('th');
+  actionsHeader.textContent = 'Actions';
+  headerRow.append(tagHeader, valueHeader, actionsHeader);
+  thead.appendChild(headerRow);
 
   for (const tag in tagMap) {
-    const row = document.createElement("div");
-    row.className = "tag-row";
-
+    const row = document.createElement('tr');
+    
+    const tagCell = document.createElement('td');
     const label = document.createElement("strong");
     label.textContent = `{{${tag}}}`;
     label.style.background = colorForTag(tag);
-    label.padding = "2px 6px";
+    label.style.padding = "2px 6px";
     label.style.borderRadius = "4px";
+    tagCell.appendChild(label);
 
+    const valueCell = document.createElement('td');
     const input = document.createElement("input");
     input.value = tagMap[tag];
     input.onchange = () => {
@@ -169,87 +189,119 @@ function renderTags() {
       saveTags();
       processEditor();
     };
+    valueCell.appendChild(input);
 
+    const actionsCell = document.createElement('td');
     const del = document.createElement("button");
     del.textContent = "✕";
+    del.className = 'delete-button';
     del.onclick = () => {
       delete tagMap[tag];
       saveTags();
       renderTags();
       processEditor();
     };
+    actionsCell.appendChild(del);
 
-    row.append(label, input, del);
-    container.appendChild(row);
+    row.append(tagCell, valueCell, actionsCell);
+    tbody.appendChild(row);
   }
+
+  table.append(thead, tbody);
+  container.appendChild(table);
 }
 
-function showPopup(x, y) {
-    const popup = document.getElementById('popup');
-    const popupContent = document.getElementById('popup-content');
-    popupContent.innerHTML = '';
+function getSelectionRect() {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return null;
+  const range = sel.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+  return rect;
+}
 
-    for (const tag in tagMap) {
-        const button = document.createElement('button');
-        button.textContent = tag;
-        button.onclick = () => applyTag(tag);
-        popupContent.appendChild(button);
-    }
+function showTagPopup() {
+  const sel = window.getSelection();
+  if (!sel || sel.toString().trim() === "") return;
 
-    const createButton = document.createElement('button');
-    createButton.textContent = '+ Create new tag';
-    createButton.onclick = () => applyTag(null);
-    popupContent.appendChild(createButton);
+  pendingSelection = sel.toString();
 
-    popup.style.left = x + 'px';
-    popup.style.top = y + 'px';
-    popup.style.display = 'block';
+  const rect = getSelectionRect();
+  if (!rect) return;
+
+  const popup = document.getElementById("popup");
+  const content = document.getElementById("popup-content");
+
+  content.innerHTML = "";
+
+  // Existing tags
+  for (const tag in tagMap) {
+    const btn = document.createElement("button");
+    btn.textContent = `{{${tag}}}`;
+    btn.style.background = colorForTag(tag);
+    btn.onclick = () => applyTagFromPopup(tag);
+    content.appendChild(btn);
+  }
+
+  // Create new tag
+  const createBtn = document.createElement("button");
+  createBtn.textContent = "+ Create new tag";
+  createBtn.onclick = () => {
+    const tag = prompt("Enter new tag name:");
+    if (!tag) return;
+    tagMap[tag] = pendingSelection;
+    saveTags();
+    renderTags();
+    applyTagFromPopup(tag);
+  };
+
+  content.appendChild(createBtn);
+
+  popup.style.left = `${rect.left + window.scrollX}px`;
+  popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
+  popup.style.display = "block";
 }
 
 function hidePopup() {
-    const popup = document.getElementById('popup');
-    popup.style.display = 'none';
+  const popup = document.getElementById("popup");
+  popup.style.display = "none";
 }
 
-function applyTag(tag) {
-    if (!pendingSelection) return;
+function applyTagFromPopup(tag) {
+  const editor = document.getElementById("input");
+  const plain = getPlainText();
 
-    if (!tag) {
-        tag = prompt("Enter new tag name:");
-        if (!tag) {
-            pendingSelection = null;
-            return;
-        }
-        tagMap[tag] = pendingSelection;
-        saveTags();
-        renderTags();
+  const pattern = new RegExp(escapeRegex(pendingSelection), "gi");
+  const replaced = plain.replace(pattern, `{{${tag}}}`);
+
+  editor.innerHTML = renderHighlightedHTML(replaced);
+
+  // Move cursor after the tag
+  const tags = editor.querySelectorAll(".tag");
+  for (const t of tags) {
+    if (t.textContent === `{{${tag}}}`) {
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.setStartAfter(t);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      break;
     }
+  }
 
-    const editor = document.getElementById("input");
-    const plain = getPlainText();
-    const pattern = new RegExp(escapeRegex(pendingSelection), "gi");
-    const replaced = plain.replace(pattern, `{{${tag}}}`);
-    editor.innerHTML = renderHighlightedHTML(replaced);
-    processEditor();
-    hidePopup();
-    pendingSelection = null;
+  hidePopup();
+  pendingSelection = null;
 }
 
-document.getElementById('input').addEventListener('mouseup', (event) => {
-    const selection = window.getSelection().toString().trim();
-    if (selection) {
-        pendingSelection = selection;
-        showPopup(event.clientX, event.clientY);
-    } else {
-        hidePopup();
-    }
+document.getElementById("input").addEventListener("mouseup", () => {
+  setTimeout(showTagPopup, 0);
 });
 
-document.addEventListener('mousedown', (event) => {
-    const popup = document.getElementById('popup');
-    if (!popup.contains(event.target) && event.target.id !== 'input') {
-        hidePopup();
-    }
+document.addEventListener("click", (e) => {
+  const popup = document.getElementById("popup");
+  if (!popup.contains(e.target)) {
+    hidePopup();
+  }
 });
 
 
@@ -289,6 +341,17 @@ function unredact() {
   }
   document.getElementById("ai").value = text;
 }
+
+document.getElementById('ai').addEventListener('paste', () => {
+    setTimeout(() => {
+        const loader = document.getElementById('loader');
+        loader.classList.remove('hidden');
+        setTimeout(() => {
+            unredact();
+            loader.classList.add('hidden');
+        }, 1500);
+    }, 0);
+});
 
 document.getElementById("input").addEventListener("input", processEditor);
 

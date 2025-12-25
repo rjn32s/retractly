@@ -8,30 +8,53 @@
 <body>
 
 <div class="container">
-    <h2 class="title">Retractly — MVP</h2>
+    <h2 class="title">Retractly</h2>
+    <div class="slogan">Your Privacy, Protected. Safely Interact with AI.</div>
 
     <div class="grid">
-      <div id="input" class="editor" contenteditable="true"
-           placeholder="Paste or type text here"></div>
-
-      <textarea id="ai" placeholder="Paste AI response here"
-                style="height:220px;width:100%"></textarea>
+      <div class="card-wrap">
+          <div class="editor-label green">Prompt Input</div>
+          <div id="input" class="editor" contenteditable="true"
+               placeholder="Paste or type text here"></div>
+      </div>
+      <div class="doodle arrow"></div> <!-- Added Doodle -->
+      <div class="card-wrap textarea-container">
+          <div class="editor-label red">AI Response</div>
+          <textarea id="ai" placeholder="Paste AI response here"
+                    style="height:220px;width:100%"></textarea>
+          <div id="loader" class="loader hidden"></div>
+      </div>
     </div>
 
-    <div style="margin-top: 8px;">
-      <button onclick="unredact()">Unredact →</button>
-      <button onclick="importTags()">Import Tags</button>
-      <button onclick="exportTags()">Export Tags</button>
-      <input type="file" id="importFile" style="display: none" onchange="handleFileSelect(event)">
+    <div class="instructions">
+        <h3>How to use Retractly:</h3>
+        <p>1. <strong>Paste text into the "Prompt Input"</strong> editor. Select sensitive information (like names, companies, emails).</p>
+        <p>2. A <strong>popup will appear</strong>. Choose an existing tag or create a new one to redact the selection.</p>
+        <p>3. <strong>Copy the redacted text</strong> into the "AI Response" area. It will automatically unredact after 1.5 seconds.</p>
+        <p>4. Click the ⚙️ icon to <strong>manage your tags</strong> (import/export/edit).</p>
+    </div>
+
+    <div class="settings-section">
+        <button id="settingsButton" onclick="toggleSettings()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .3 1.05L22 18l-3.3 2-1 .3a1.65 1.65 0 0 0-1.05.3H12V3h3.6c.3 0 .6.1.8.3l1 .3 3.3 2-.3 2a1.65 1.65 0 0 0-.3 1.05V15z"></path>
+            </svg>
+        </button>
+        <div class="tags hidden" id="tags">
+            <h4>Tag Map</h4>
+            <div class="tag-actions">
+                <button onclick="importTags()">Import Tags</button>
+                <button onclick="exportTags()">Export Tags</button>
+            </div>
+            <div id="tag-table-container"></div>
+        </div>
     </div>
 </div>
 
 <div id="popup" class="popup" style="display: none;">
     <div id="popup-content"></div>
 </div>
-
-
-<div class="tags" id="tags"></div>
 
 <script src="scripts/script.js"></script>
 

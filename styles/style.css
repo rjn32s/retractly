@@ -1,16 +1,87 @@
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
     margin: 0;
-    background-color: #f4f4f5;
+    min-height: 100vh;
+    background: radial-gradient(
+      circle at top left,
+      #d9f99d 0%,
+      #bbf7d0 30%,
+      #a7f3d0 60%,
+      #86efac 100%
+    );
     color: #18181b;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    position: relative; /* Needed for pseudo-element positioning */
+    overflow-x: hidden; /* Prevent horizontal scroll from pseudo-elements */
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.2), transparent 45%);
+  pointer-events: none;
+  z-index: -2; /* Behind everything else */
 }
 
 .container {
-    max-width: 960px;
+    max-width: 768px;
     margin: 0 auto;
     padding: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 40%);
+    z-index: -1;
+    animation: pulse 10s infinite;
+}
+
+.container::after {
+    content: '';
+    position: absolute;
+    bottom: 15%;
+    right: 10%;
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.15));
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    z-index: -1;
+    opacity: 0.5;
+    animation: spin-slow 20s infinite linear;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.1; }
+    50% { transform: scale(1.2); opacity: 0.2; }
+}
+
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.card-wrap {
+  position: relative;
+  width: 100%; /* Ensure it takes full width of its grid cell */
+}
+
+.card-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: 28px;
+  background: rgba(255,255,255,0.25);
+  filter: blur(18px);
+  z-index: -1;
 }
 
 .title {
@@ -20,43 +91,147 @@ body {
     margin-bottom: 24px;
 }
 
+.slogan {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 32px;
+    opacity: 0.8;
+}
+
+.instructions {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.instructions h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #3f3f46;
+}
+
+.instructions p {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.instructions strong {
+    color: #18181b;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 32px;
+  margin-top: 32px;
+  position: relative; /* For doodle positioning */
 }
 
-.editor, .tags, textarea {
-  min-height: 220px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  padding: 16px;
-  white-space: pre-wrap;
-  outline: none;
-  transition: box-shadow 0.2s ease-in-out;
-  border: 1px solid #e4e4e7;
+.doodle {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0.15;
+  color: #18181b; /* Inherit text color for subtle appearance */
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+.doodle.arrow {
+  top: 55%;
+  left: 48%;
+  transform: rotate(12deg);
+  content: "→"; /* Unicode arrow character */
+}
+
+.editor,
+.textarea-container textarea {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 20px;
+  min-height: 240px;
+  border: none;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.editor:hover,
+.textarea-container textarea:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.04);
+}
+
+.editor-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  opacity: 0.9;
+  letter-spacing: 0.04em;
+  transform: rotate(-1.5deg);
+  margin-left: 8px;
+}
+
+.editor-label.green {
+  color: #15803d;
+}
+
+.editor-label.red {
+  color: #b91c1c;
+  transform: rotate(1.2deg);
+}
+
+.editor {
+  box-shadow:
+    0 0 0 3px rgba(34, 197, 94, 0.35),
+    0 0 0 6px rgba(34, 197, 94, 0.15),
+    0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+.textarea-container textarea {
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.35),
+    0 0 0 6px rgba(239, 68, 68, 0.15),
+    0 18px 40px rgba(0, 0, 0, 0.12);
 }
 
 textarea {
     resize: vertical;
 }
 
-.editor:focus, textarea:focus {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
-    border-color: #ef4444;
-}
-
 .tag {
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-weight: 500;
-  font-size: 0.9em;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-weight: 600;
+  font-size: 0.85em;
+  box-shadow:
+    inset 0 -1px 0 rgba(0,0,0,0.15),
+    0 2px 6px rgba(0,0,0,0.15);
+  transform: rotate(-0.5deg);
 }
 
-.tags { 
-    margin: 16px 0;
-    padding: 16px;
+.tags {
+    margin-top: 16px;
+    width: 100%;
+}
+
+.tags h4 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    margin-top: 24px;
+    width: 100%;
 }
 
 .tag-row {
@@ -64,6 +239,127 @@ textarea {
   gap: 12px;
   margin-bottom: 8px;
   align-items: center;
+}
+
+#settingsButton {
+    background-color: transparent;
+    color: #18181b;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    align-self: flex-end; /* Align button to the right */
+}
+
+#settingsButton:hover {
+    background-color: #e4e4e7;
+}
+
+.hidden {
+    display: none;
+}
+
+#tag-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #e4e4e7;
+}
+
+#tag-table-container th, #tag-table-container td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e4e4e7;
+}
+
+#tag-table-container tr:last-child td {
+    border-bottom: none;
+}
+
+#tag-table-container th {
+    font-weight: 500;
+    font-size: 0.9em;
+    color: #71717a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom-width: 1px;
+}
+
+#tag-table-container td:last-child, #tag-table-container th:last-child {
+    text-align: right;
+}
+
+#tag-table-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #e4e4e7;
+    border-radius: 4px;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+#tag-table-container input:focus {
+    border-color: #ef4444;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+#tag-table-container .delete-button {
+    background-color: transparent;
+    color: #71717a;
+    padding: 4px;
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    border-radius: 4px;
+}
+
+#tag-table-container .delete-button:hover {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+.textarea-container {
+    position: relative;
+}
+
+.loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ef4444;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.tag-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+    gap: 8px;
+}
+
+.tag-actions button {
+    background-color: #f4f4f5;
+    color: #18181b;
+}
+
+.tag-actions button:hover {
+    background-color: #e4e4e7;
 }
 
 button {
@@ -94,10 +390,12 @@ select {
 
 .popup {
     position: absolute;
-    background-color: #fff;
-    border: 1px solid #e4e4e7;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    box-shadow:
+      0 12px 30px rgba(0,0,0,0.15),
+      0 0 0 1px rgba(0,0,0,0.05);
     padding: 8px;
     z-index: 100;
     transition: transform 0.1s ease-in-out, opacity 0.1s ease-in-out;
