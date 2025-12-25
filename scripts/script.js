@@ -356,3 +356,5 @@ document.getElementById('ai').addEventListener('paste', () => {
 document.getElementById("input").addEventListener("input", processEditor);
 
 renderTags();
+
+document.getElementById('importFile').addEventListener('change', handleFileSelect);

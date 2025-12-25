@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Retractly</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
@@ -44,6 +45,7 @@
             <div class="tag-actions">
                 <button onclick="importTags()">Import Tags</button>
                 <button onclick="exportTags()">Export Tags</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
             </div>
             <div id="tag-table-container"></div>
         </div>
@@ -52,6 +54,14 @@
 
 <div id="popup" class="popup" style="display: none;">
     <div id="popup-content"></div>
+</div>
+
+<div class="bg-animations">
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+<path d="M0,400 Q300,350 600,400 T1200,400" stroke="rgba(0,0,0,0.03)" fill="none" stroke-width="3" class="squiggly-line"/>
+<path d="M0,500 Q300,450 600,500 T1200,500" stroke="rgba(0,0,0,0.02)" fill="none" stroke-width="2" class="squiggly-line delay1"/>
+<path d="M0,300 Q300,250 600,300 T1200,300" stroke="rgba(0,0,0,0.025)" fill="none" stroke-width="2" class="squiggly-line delay2"/>
+</svg>
 </div>
 
 <script src="scripts/script.js"></script>
